@@ -3,10 +3,10 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir>$(SolutionDir)..\..\..\..\build_results\$(Configuration)\bin\</OutDir>
+    <OutDir>$(ProjectDir)..\..\..\..\build_results\$(Configuration)\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup>
-    <IntDir>$(SolutionDir)..\..\..\..\build_results\$(Configuration)\obj\boost\$(ProjectName)\</IntDir>
+    <IntDir>$(ProjectDir)..\..\..\..\build_results\$(Configuration)\obj\boost\$(ProjectName)\</IntDir>
     <TargetName>boost_$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
