@@ -642,31 +642,31 @@ namespace
 
     //  operator == and != are implemented separately, so test separately
 
-    path p1("fe/fi/fo/fum");
-    path p2(p1);
-    path p3("fe/fi/fo/fumm");
-    BOOST_TEST(p1.string() != p3.string());
+    path p101("fe/fi/fo/fum");
+    path p102(p101);
+    path p103("fe/fi/fo/fumm");
+    BOOST_TEST(p101.string() != p103.string());
 
     // check each overload
-    BOOST_TEST(p1 != p3);
-    BOOST_TEST(p1 != p3.string());
-    BOOST_TEST(p1 != p3.string().c_str());
-    BOOST_TEST(p1.string() != p3);
-    BOOST_TEST(p1.string().c_str() != p3);
+    BOOST_TEST(p101 != p103);
+    BOOST_TEST(p101 != p103.string());
+    BOOST_TEST(p101 != p103.string().c_str());
+    BOOST_TEST(p101.string() != p103);
+    BOOST_TEST(p101.string().c_str() != p103);
 
-    p3 = p2;
-    BOOST_TEST(p1.string() == p3.string());
+    p103 = p102;
+    BOOST_TEST(p101.string() == p103.string());
 
     // check each overload
-    BOOST_TEST(p1 == p3);
-    BOOST_TEST(p1 == p3.string());
-    BOOST_TEST(p1 == p3.string().c_str());
-    BOOST_TEST(p1.string() == p3);
-    BOOST_TEST(p1.string().c_str() == p3);
+    BOOST_TEST(p101 == p103);
+    BOOST_TEST(p101 == p103.string());
+    BOOST_TEST(p101 == p103.string().c_str());
+    BOOST_TEST(p101.string() == p103);
+    BOOST_TEST(p101.string().c_str() == p103);
 
     if (platform == "Windows")
     {
-      std::cout << "Windows relational tests..." << std::endl;
+      std::cout << "  Windows relational tests..." << std::endl;
       path p10 ("c:\\file");
       path p11 ("c:/file");
       // check each overload
@@ -730,6 +730,22 @@ namespace
       BOOST_TEST(!(L"c:\\file" > p11));
       BOOST_TEST(!(L"c:/file" > p11));
     }
+
+    // relative
+
+    BOOST_TEST(fs::relative("/abc/def", "/abc") == path("def"));
+    BOOST_TEST(fs::relative("abc/def", "abc") == path("def"));
+    BOOST_TEST(fs::relative("/abc/xyz/def", "/abc") == path("xyz/def"));
+    BOOST_TEST(fs::relative("abc/xyz/def", "abc") == path("xyz/def"));
+
+    if (platform == "Windows")
+    {
+      std::cout << "  Windows relatie tests..." << std::endl;
+      BOOST_TEST(fs::relative("\\abc\\xyz\\def", "/abc") == path("xyz/def"));
+      std::cout << "    fs::relative(\"/abc/xyz/def\", \"/abc\") is "
+        << fs::relative("/abc/xyz/def", "/abc") << std::endl;
+      BOOST_TEST(fs::relative("abc\\xyz\\def", "abc") == path("xyz/def"));
+    }
   }
 
   //  query_and_decomposition_tests  ---------------------------------------------------//
@@ -741,7 +757,24 @@ namespace
   {
     std::cout << "query_and_decomposition_tests..." << std::endl;
 
+    // these are the examples given in reference docs, so check they work
+    BOOST_TEST(path("/foo/bar.txt").parent_path() == "/foo");
+    BOOST_TEST(path("/foo/bar").parent_path() == "/foo");    
+    BOOST_TEST(path("/foo/bar/").parent_path() == "/foo/bar");   
+    BOOST_TEST(path("/").parent_path() == "");           
+    BOOST_TEST(path(".").parent_path() == "");           
+    BOOST_TEST(path("..").parent_path() == "");
+    BOOST_TEST(path("/foo/bar.txt").filename() == "bar.txt");
+    BOOST_TEST(path("/foo/bar").filename() == "bar");    
+    BOOST_TEST(path("/foo/bar/").filename() == ".");   
+    BOOST_TEST(path("/").filename() == "/");           
+    BOOST_TEST(path(".").filename() == ".");           
+    BOOST_TEST(path("..").filename() == "..");
+
     // stem() tests not otherwise covered
+    BOOST_TEST(path(".").stem() == ".");
+    BOOST_TEST(path("..").stem() == "..");
+    BOOST_TEST(path(".a").stem() == "");
     BOOST_TEST(path("b").stem() == "b");
     BOOST_TEST(path("a/b.txt").stem() == "b");
     BOOST_TEST(path("a/b.").stem() == "b"); 
@@ -749,6 +782,9 @@ namespace
     BOOST_TEST(path("a.b.c.").stem() == "a.b.c");
 
     // extension() tests not otherwise covered
+    BOOST_TEST(path(".").extension() == "");
+    BOOST_TEST(path("..").extension() == "");
+    BOOST_TEST(path(".a").extension() == ".a");
     BOOST_TEST(path("a/b").extension() == "");
     BOOST_TEST(path("a.b/c").extension() == "");
     BOOST_TEST(path("a/b.txt").extension() == ".txt");
@@ -1567,13 +1603,14 @@ namespace
     PATH_TEST_EQ(path("foo/") / "bar", "foo/bar");
     append_test_aux("foo/", "bar", "foo/bar");
 
-    PATH_TEST_EQ(path("foo/") / "/bar", "foo//bar");
-    append_test_aux("foo/", "/bar", "foo//bar");
 
     if (platform == "Windows")
     {
       PATH_TEST_EQ(path("foo") / "bar", "foo\\bar");
       append_test_aux("foo", "bar", "foo\\bar");
+
+      PATH_TEST_EQ(path("foo\\") / "\\bar", "foo\\\\bar");
+      append_test_aux("foo\\", "\\bar", "foo\\\\bar");
 
       // hand created test case specific to Windows
       PATH_TEST_EQ(path("c:") / "bar", "c:bar");
@@ -1776,6 +1813,126 @@ namespace
     }
   }
 
+  //  lexically_normal_tests  ----------------------------------------------------------//
+
+  void lexically_normal_tests()
+  {
+    std::cout << "lexically_normal_tests..." << std::endl;
+
+    //  Note: lexically_lexically_normal() uses /= to build up some results, so these results will
+    //  have the platform's preferred separator. Since that is immaterial to the correct
+    //  functioning of lexically_lexically_normal(), the test results are converted to generic form,
+    //  and the expected results are also given in generic form. Otherwise many of the
+    //  tests would incorrectly be reported as failing on Windows.
+
+    PATH_TEST_EQ(path("").lexically_normal().generic_path(), "");
+    PATH_TEST_EQ(path("/").lexically_normal().generic_path(), "/");
+    PATH_TEST_EQ(path("//").lexically_normal().generic_path(), "//");
+    PATH_TEST_EQ(path("///").lexically_normal().generic_path(), "/");
+    PATH_TEST_EQ(path("f").lexically_normal().generic_path(), "f");
+    PATH_TEST_EQ(path("foo").lexically_normal().generic_path(), "foo");
+    PATH_TEST_EQ(path("foo/").lexically_normal().generic_path(), "foo/.");
+    PATH_TEST_EQ(path("f/").lexically_normal().generic_path(), "f/.");
+    PATH_TEST_EQ(path("/foo").lexically_normal().generic_path(), "/foo");
+    PATH_TEST_EQ(path("foo/bar").lexically_normal().generic_path(), "foo/bar");
+    PATH_TEST_EQ(path("..").lexically_normal().generic_path(), "..");
+    PATH_TEST_EQ(path("../..").lexically_normal().generic_path(), "../..");
+    PATH_TEST_EQ(path("/..").lexically_normal().generic_path(), "/..");
+    PATH_TEST_EQ(path("/../..").lexically_normal().generic_path(), "/../..");
+    PATH_TEST_EQ(path("../foo").lexically_normal().generic_path(), "../foo");
+    PATH_TEST_EQ(path("foo/..").lexically_normal().generic_path(), ".");
+    PATH_TEST_EQ(path("foo/../").lexically_normal().generic_path(), "./.");
+    PATH_TEST_EQ((path("foo") / "..").lexically_normal().generic_path() , ".");
+    PATH_TEST_EQ(path("foo/...").lexically_normal().generic_path(), "foo/...");
+    PATH_TEST_EQ(path("foo/.../").lexically_normal().generic_path(), "foo/.../.");
+    PATH_TEST_EQ(path("foo/..bar").lexically_normal().generic_path(), "foo/..bar");
+    PATH_TEST_EQ(path("../f").lexically_normal().generic_path(), "../f");
+    PATH_TEST_EQ(path("/../f").lexically_normal().generic_path(), "/../f");
+    PATH_TEST_EQ(path("f/..").lexically_normal().generic_path(), ".");
+    PATH_TEST_EQ((path("f") / "..").lexically_normal().generic_path() , ".");
+    PATH_TEST_EQ(path("foo/../..").lexically_normal().generic_path(), "..");
+    PATH_TEST_EQ(path("foo/../../").lexically_normal().generic_path(), "../.");
+    PATH_TEST_EQ(path("foo/../../..").lexically_normal().generic_path(), "../..");
+    PATH_TEST_EQ(path("foo/../../../").lexically_normal().generic_path(), "../../.");
+    PATH_TEST_EQ(path("foo/../bar").lexically_normal().generic_path(), "bar");
+    PATH_TEST_EQ(path("foo/../bar/").lexically_normal().generic_path(), "bar/.");
+    PATH_TEST_EQ(path("foo/bar/..").lexically_normal().generic_path(), "foo");
+    PATH_TEST_EQ(path("foo/./bar/..").lexically_normal().generic_path(), "foo");
+    std::cout << path("foo/./bar/..").lexically_normal() << std::endl;  // outputs "foo"
+    PATH_TEST_EQ(path("foo/bar/../").lexically_normal().generic_path(), "foo/.");
+    PATH_TEST_EQ(path("foo/./bar/../").lexically_normal().generic_path(), "foo/.");
+    std::cout << path("foo/./bar/../").lexically_normal() << std::endl;  // POSIX: "foo/.", Windows: "foo\." 
+    PATH_TEST_EQ(path("foo/bar/../..").lexically_normal().generic_path(), ".");
+    PATH_TEST_EQ(path("foo/bar/../../").lexically_normal().generic_path(), "./.");
+    PATH_TEST_EQ(path("foo/bar/../blah").lexically_normal().generic_path(), "foo/blah");
+    PATH_TEST_EQ(path("f/../b").lexically_normal().generic_path(), "b");
+    PATH_TEST_EQ(path("f/b/..").lexically_normal().generic_path(), "f");
+    PATH_TEST_EQ(path("f/b/../").lexically_normal().generic_path(), "f/.");
+    PATH_TEST_EQ(path("f/b/../a").lexically_normal().generic_path(), "f/a");
+    PATH_TEST_EQ(path("foo/bar/blah/../..").lexically_normal().generic_path(), "foo");
+    PATH_TEST_EQ(path("foo/bar/blah/../../bletch").lexically_normal().generic_path(), "foo/bletch");
+    PATH_TEST_EQ(path("//net").lexically_normal().generic_path(), "//net");
+    PATH_TEST_EQ(path("//net/").lexically_normal().generic_path(), "//net/");
+    PATH_TEST_EQ(path("//..net").lexically_normal().generic_path(), "//..net");
+    PATH_TEST_EQ(path("//net/..").lexically_normal().generic_path(), "//net/..");
+    PATH_TEST_EQ(path("//net/foo").lexically_normal().generic_path(), "//net/foo");
+    PATH_TEST_EQ(path("//net/foo/").lexically_normal().generic_path(), "//net/foo/.");
+    PATH_TEST_EQ(path("//net/foo/..").lexically_normal().generic_path(), "//net/");
+    PATH_TEST_EQ(path("//net/foo/../").lexically_normal().generic_path(), "//net/.");
+
+    PATH_TEST_EQ(path("/net/foo/bar").lexically_normal().generic_path(), "/net/foo/bar");
+    PATH_TEST_EQ(path("/net/foo/bar/").lexically_normal().generic_path(), "/net/foo/bar/.");
+    PATH_TEST_EQ(path("/net/foo/..").lexically_normal().generic_path(), "/net");
+    PATH_TEST_EQ(path("/net/foo/../").lexically_normal().generic_path(), "/net/.");
+
+    PATH_TEST_EQ(path("//net//foo//bar").lexically_normal().generic_path(), "//net/foo/bar");
+    PATH_TEST_EQ(path("//net//foo//bar//").lexically_normal().generic_path(), "//net/foo/bar/.");
+    PATH_TEST_EQ(path("//net//foo//..").lexically_normal().generic_path(), "//net/");
+    PATH_TEST_EQ(path("//net//foo//..//").lexically_normal().generic_path(), "//net/.");
+
+    PATH_TEST_EQ(path("///net///foo///bar").lexically_normal().generic_path(), "/net/foo/bar");
+    PATH_TEST_EQ(path("///net///foo///bar///").lexically_normal().generic_path(), "/net/foo/bar/.");
+    PATH_TEST_EQ(path("///net///foo///..").lexically_normal().generic_path(), "/net");
+    PATH_TEST_EQ(path("///net///foo///..///").lexically_normal().generic_path(), "/net/.");
+
+    if (platform == "Windows")
+    {
+      PATH_TEST_EQ(path("c:..").lexically_normal().generic_path(), "c:..");
+      PATH_TEST_EQ(path("c:foo/..").lexically_normal().generic_path(), "c:");
+
+      PATH_TEST_EQ(path("c:foo/../").lexically_normal().generic_path(), "c:.");
+
+      PATH_TEST_EQ(path("c:/foo/..").lexically_normal().generic_path(), "c:/");
+      PATH_TEST_EQ(path("c:/foo/../").lexically_normal().generic_path(), "c:/.");
+      PATH_TEST_EQ(path("c:/..").lexically_normal().generic_path(), "c:/..");
+      PATH_TEST_EQ(path("c:/../").lexically_normal().generic_path(), "c:/../.");
+      PATH_TEST_EQ(path("c:/../..").lexically_normal().generic_path(), "c:/../..");
+      PATH_TEST_EQ(path("c:/../../").lexically_normal().generic_path(), "c:/../../.");
+      PATH_TEST_EQ(path("c:/../foo").lexically_normal().generic_path(), "c:/../foo");
+      PATH_TEST_EQ(path("c:/../foo/").lexically_normal().generic_path(), "c:/../foo/.");
+      PATH_TEST_EQ(path("c:/../../foo").lexically_normal().generic_path(), "c:/../../foo");
+      PATH_TEST_EQ(path("c:/../../foo/").lexically_normal().generic_path(), "c:/../../foo/.");
+      PATH_TEST_EQ(path("c:/..foo").lexically_normal().generic_path(), "c:/..foo");
+    }
+    else // POSIX
+    {
+      PATH_TEST_EQ(path("c:..").lexically_normal(), "c:..");
+      PATH_TEST_EQ(path("c:foo/..").lexically_normal(), ".");
+      PATH_TEST_EQ(path("c:foo/../").lexically_normal(), "./.");
+      PATH_TEST_EQ(path("c:/foo/..").lexically_normal(), "c:");
+      PATH_TEST_EQ(path("c:/foo/../").lexically_normal(), "c:/.");
+      PATH_TEST_EQ(path("c:/..").lexically_normal(), ".");
+      PATH_TEST_EQ(path("c:/../").lexically_normal(), "./.");
+      PATH_TEST_EQ(path("c:/../..").lexically_normal(), "..");
+      PATH_TEST_EQ(path("c:/../../").lexically_normal(), "../.");
+      PATH_TEST_EQ(path("c:/../foo").lexically_normal(), "foo");
+      PATH_TEST_EQ(path("c:/../foo/").lexically_normal(), "foo/.");
+      PATH_TEST_EQ(path("c:/../../foo").lexically_normal(), "../foo");
+      PATH_TEST_EQ(path("c:/../../foo/").lexically_normal(), "../foo/.");
+      PATH_TEST_EQ(path("c:/..foo").lexically_normal(), "c:/..foo");
+    }
+  }
+
 } // unnamed namespace
 
 static boost::filesystem::path ticket_6737 = "FilePath";  // #6737 reported this crashed
@@ -1802,10 +1959,10 @@ int cpp_main(int, char*[])
   p3 = p2;
   BOOST_TEST(p1.string() == p3.string());
 
-  path p4("foobar");
-  BOOST_TEST(p4.string() == "foobar");
-  p4 = p4; // self-assignment
-  BOOST_TEST(p4.string() == "foobar");
+  path p04("foobar");
+  BOOST_TEST(p04.string() == "foobar");
+  p04 = p04; // self-assignment
+  BOOST_TEST(p04.string() == "foobar");
 
   construction_tests();
   append_tests();
@@ -1819,6 +1976,7 @@ int cpp_main(int, char*[])
   name_function_tests();
   replace_extension_tests();
   make_preferred_tests();
+  lexically_normal_tests();
 
   // verify deprecated names still available
 
