@@ -150,3 +150,5 @@ $RECYCLE.BIN/
 .DS_Store
 
 **/.vs/*
+CMakeSettings.json
+*.pdf
