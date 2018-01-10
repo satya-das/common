@@ -7,7 +7,7 @@ inline size_t num_of_same_chars_at_start(const stringType& s1, const stringType&
 {
   if (s1.length() > s2.length()) return num_of_same_chars_at_start(s2, s1);
   if (s1.empty()) return 0;
-  stringType::size_type i = 0;
+  typename stringType::size_type i = 0;
   for (; i < s1.length(); ++i)
     if (s1[i] != s2[i]) break;
   return i;
