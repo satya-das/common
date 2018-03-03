@@ -7,8 +7,8 @@ endif()
 if(MSVC)
 	SET(CMAKE_CXX_FLAGS "/EHsc")
 else()
-	SET(CMAKE_CXX_FLAGS "-g -m32 -std=c++17")
-	SET(CMAKE_C_FLAGS "-g -m32")
+	SET(CMAKE_CXX_FLAGS "-g -m32 -std=c++17 -fvisibility=hidden -fvisibility-inlines-hidden")
+	SET(CMAKE_C_FLAGS "-g -m32 -fvisibility=hidden -fvisibility-inlines-hidden")
 endif(MSVC)
 
 # Define DLLEXPORT and DLLIMPORT
