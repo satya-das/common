@@ -21,7 +21,7 @@ if(WIN32 OR CYGWIN )
 		set(DLLIMPORT "__declspec(dllimport)")
 	endif()
 else()
-	set(DLLEXPORT "__attribute__ ((visibility (\"default\"))")
+	set(DLLEXPORT "__attribute__((visibility (\"default\")))")
 	set(DLLIMPORT "")
 endif()
 
