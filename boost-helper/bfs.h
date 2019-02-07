@@ -38,7 +38,7 @@ inline boost::filesystem::path relative_path(boost::filesystem::path from, boost
   auto f = from.string().substr(n);
   auto nUp = std::count(f.begin(), f.end(), '/');
   std::string relPath = (!f.empty()) ? "../" : "";
-  for (size_t i = 0; i < nUp; ++i)
+  for (size_t i = 0; i < (size_t) nUp; ++i)
   {
     relPath += "../";
   }
