@@ -10,7 +10,7 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m32 -std=c++1z -fvisibility=hidden -fvisibility-inlines-hidden")
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -m32 -fvisibility=hidden")
 else()
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m32 -fvisibility=hidden -fvisibility-inlines-hidden")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m32 -std=c++14 -fvisibility=hidden -fvisibility-inlines-hidden")
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -m32 -fvisibility=hidden")
 endif()
 
