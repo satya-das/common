@@ -1,6 +1,8 @@
-if(${CMAKE_CXX_COMPILER_ID} MATCHES "MSVC")
+cmake_policy(SET CMP0054 NEW)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++1z -fvisibility=hidden -fvisibility-inlines-hidden")
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fvisibility=hidden")
 else()
@@ -10,7 +12,7 @@ endif()
 
 # Define DLLEXPORT and DLLIMPORT
 if(WIN32 OR CYGWIN )
-	if(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(DLLEXPORT "__attribute__((dllexport))")
 		set(DLLIMPORT "")
 	else()
