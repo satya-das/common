@@ -1,21 +1,10 @@
 cmake_minimum_required(VERSION 2.8.7)
 
-if (CMAKE_BUILD_TYPE MATCHES Release)
-	set(TARGET_SUBDIR Release)
-else()
-	set(TARGET_SUBDIR Debug)
-endif()
+project(boost)
 
 if(MSVC)
 	SET(CMAKE_CXX_FLAGS "/EHsc")
 endif(MSVC)
-
-set(BASEOUTDIR ${CMAKE_CURRENT_LIST_DIR}/../../../../build_results/${CMAKE_CXX_COMPILER_ID}/${TARGET_SUBDIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BASEOUTDIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BASEOUTDIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASEOUTDIR}/bin)
-
-project(boost)
 
 # BOOST FILESYSTEM
 file(GLOB_RECURSE FS_SOURCES
