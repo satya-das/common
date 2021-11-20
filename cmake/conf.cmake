@@ -11,6 +11,8 @@ else()
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fvisibility=hidden")
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+
 # Define DLLEXPORT and DLLIMPORT
 if(WIN32 OR CYGWIN )
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

@@ -11,11 +11,8 @@
 
 #include <boost/config/warning_disable.hpp>
 
-#include <boost/detail/lightweight_test.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/system/cygwin_error.hpp>
-#include <boost/system/linux_error.hpp>
-#include <boost/system/windows_error.hpp>
+#include <boost/core/lightweight_test.hpp>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -123,17 +120,7 @@ int main( int, char ** )
   BOOST_TEST( generic_category() != system_category() );
   BOOST_TEST( system_category() != generic_category() );
 
-  if ( std::less<const error_category*>()( &generic_category(), &system_category() ) )
-  {
-    BOOST_TEST( generic_category() < system_category() );
-    BOOST_TEST( !(system_category() < generic_category()) );
-  }
-  else
-  {
-    BOOST_TEST( system_category() < generic_category() );
-    BOOST_TEST( !(generic_category() < system_category()) );
-  }
-
+  BOOST_TEST_NE( generic_category() < system_category(), system_category() < generic_category() );
 
   error_code ec;
   error_condition econd;
@@ -207,7 +194,8 @@ int main( int, char ** )
 #if defined(BOOST_WINDOWS_API)
   // Borland appends newline, so just check text
   BOOST_TEST( ec.message().substr(0,13) == "Unknown error" );
-  BOOST_TEST( ec_0_system.message().substr(0,36) == "The operation completed successfully" );
+  // Fails when the language isn't US English
+  // BOOST_TEST( ec_0_system.message().substr(0,36) == "The operation completed successfully" );
 #elif  defined(linux) || defined(__linux) || defined(__linux__)
   // Linux appends value to message as unsigned, so it varies with # of bits
   BOOST_TEST( ec.message().substr(0,13) == "Unknown error" );
@@ -303,29 +291,7 @@ int main( int, char ** )
   BOOST_TEST( ec.default_error_condition().value() == errc::permission_denied );
   BOOST_TEST( ec.default_error_condition().category() == generic_category() );
 
-# ifdef __CYGWIN__
-
-  std::cout << "Cygwin tests...\n";
-  ec = cygwin_error::no_package;
-  BOOST_TEST( ec == cygwin_error::no_package );
-  BOOST_TEST( ec == error_code( ENOPKG, system_category() ) );
-  BOOST_TEST( ec == error_code( cygwin_error::no_package, system_category() ) );
-  BOOST_TEST( ec.default_error_condition().category() == system_category() );
-
-# elif defined(linux) || defined(__linux) || defined(__linux__)
-
-  std::cout << "Linux tests...\n";
-  ec = linux_error::dot_dot_error;
-  BOOST_TEST( ec == linux_error::dot_dot_error );
-  BOOST_TEST( ec == error_code( EDOTDOT, system_category() ) );
-  BOOST_TEST( ec == error_code( linux_error::dot_dot_error, system_category() ) );
-  BOOST_TEST( ec.default_error_condition().category() == system_category() );
-
-# endif
-
 #endif
   
   return ::boost::report_errors();
 }
-
-

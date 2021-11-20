@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>General Techniques</title>
 <link rel="stylesheet" href="../../boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
@@ -289,38 +289,6 @@
           </li>
 </ul></div>
 <p>
-        You can even add a little syntactic sugar with the use of metaclasses. Let's
-        create a special metaclass that "injects" methods in other classes.
-      </p>
-<pre class="programlisting"><span class="comment"># The one Boost.Python uses for all wrapped classes.</span>
-<span class="comment"># You can use here any class exported by Boost instead of "point"</span>
-<span class="identifier">BoostPythonMetaclass</span> <span class="special">=</span> <span class="identifier">point</span><span class="special">.</span><span class="identifier">__class__</span>
-
-<span class="keyword">class</span> <span class="identifier">injector</span><span class="special">(</span><span class="identifier">object</span><span class="special">):</span>
-    <span class="keyword">class</span> <span class="identifier">__metaclass__</span><span class="special">(</span><span class="identifier">BoostPythonMetaclass</span><span class="special">):</span>
-        <span class="keyword">def</span> <span class="identifier">__init__</span><span class="special">(</span><span class="identifier">self</span><span class="special">,</span> <span class="identifier">name</span><span class="special">,</span> <span class="identifier">bases</span><span class="special">,</span> <span class="identifier">dict</span><span class="special">):</span>
-            <span class="keyword">for</span> <span class="identifier">b</span> <span class="keyword">in</span> <span class="identifier">bases</span><span class="special">:</span>
-                <span class="keyword">if</span> <span class="identifier">type</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span> <span class="keyword">not</span> <span class="keyword">in</span> <span class="special">(</span><span class="identifier">self</span><span class="special">,</span> <span class="identifier">type</span><span class="special">):</span>
-                    <span class="keyword">for</span> <span class="identifier">k</span><span class="special">,</span><span class="identifier">v</span> <span class="keyword">in</span> <span class="identifier">dict</span><span class="special">.</span><span class="identifier">items</span><span class="special">():</span>
-                        <span class="identifier">setattr</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span><span class="identifier">k</span><span class="special">,</span><span class="identifier">v</span><span class="special">)</span>
-            <span class="keyword">return</span> <span class="identifier">type</span><span class="special">.</span><span class="identifier">__init__</span><span class="special">(</span><span class="identifier">self</span><span class="special">,</span> <span class="identifier">name</span><span class="special">,</span> <span class="identifier">bases</span><span class="special">,</span> <span class="identifier">dict</span><span class="special">)</span>
-
-<span class="comment"># inject some methods in the point foo</span>
-<span class="keyword">class</span> <span class="identifier">more_point</span><span class="special">(</span><span class="identifier">injector</span><span class="special">,</span> <span class="identifier">point</span><span class="special">):</span>
-    <span class="keyword">def</span> <span class="identifier">__repr__</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span>
-        <span class="keyword">return</span> <span class="string">'Point(x=%s, y=%s)'</span> <span class="special">%</span> <span class="special">(</span><span class="identifier">self</span><span class="special">.</span><span class="identifier">x</span><span class="special">,</span> <span class="identifier">self</span><span class="special">.</span><span class="identifier">y</span><span class="special">)</span>
-    <span class="keyword">def</span> <span class="identifier">foo</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span>
-        <span class="keyword">print</span> <span class="string">'foo!'</span>
-</pre>
-<p>
-        Now let's see how it got:
-      </p>
-<pre class="programlisting"><span class="special">&gt;&gt;&gt;</span> <span class="keyword">print</span> <span class="identifier">point</span><span class="special">()</span>
-<span class="identifier">Point</span><span class="special">(</span><span class="identifier">x</span><span class="special">=</span><span class="number">10</span><span class="special">,</span> <span class="identifier">y</span><span class="special">=</span><span class="number">10</span><span class="special">)</span>
-<span class="special">&gt;&gt;&gt;</span> <span class="identifier">point</span><span class="special">().</span><span class="identifier">foo</span><span class="special">()</span>
-<span class="identifier">foo</span><span class="special">!</span>
-</pre>
-<p>
         Another useful idea is to replace constructors with factory functions:
       </p>
 <pre class="programlisting"><span class="identifier">_point</span> <span class="special">=</span> <span class="identifier">point</span>
@@ -414,7 +382,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2005 Joel
+<td align="right"><div class="copyright-footer">Copyright © 2002-2005 Joel
       de Guzman, David Abrahams<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>

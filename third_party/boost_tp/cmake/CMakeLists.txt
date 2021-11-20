@@ -12,6 +12,17 @@ file(GLOB_RECURSE FS_SOURCES
 )
 add_library(boost_filesystem STATIC ${FS_SOURCES})
 target_include_directories(boost_filesystem PUBLIC .. ../libs/filesystem/src)
+target_compile_options(boost_filesystem
+	PRIVATE
+		-DBOOST_FILESYSTEM_NO_CXX20_ATOMIC_REF
+)
+
+if(NOT MSVC)
+	target_compile_options(boost_filesystem
+		PRIVATE
+			-Wno-unused-function
+	)
+endif()
 
 # BOOST PROGRAM OPTIONS
 

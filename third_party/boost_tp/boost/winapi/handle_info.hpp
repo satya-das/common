@@ -16,15 +16,17 @@
 
 #if BOOST_WINAPI_PARTITION_DESKTOP
 
+#include <boost/winapi/detail/header.hpp>
+
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ WINAPI
+BOOST_WINAPI_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 GetHandleInformation(
     boost::winapi::HANDLE_ hObject,
     boost::winapi::LPDWORD_ lpdwFlags);
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ WINAPI
+BOOST_WINAPI_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 SetHandleInformation(
     boost::winapi::HANDLE_ hObject,
     boost::winapi::DWORD_ dwMask,
@@ -41,18 +43,20 @@ using ::SetHandleInformation;
 
 #if defined( BOOST_USE_WINDOWS_H )
 
-const DWORD_ HANDLE_FLAG_INHERIT_            = HANDLE_FLAG_INHERIT;
-const DWORD_ HANDLE_FLAG_PROTECT_FROM_CLOSE_ = HANDLE_FLAG_PROTECT_FROM_CLOSE;
+BOOST_CONSTEXPR_OR_CONST DWORD_ HANDLE_FLAG_INHERIT_            = HANDLE_FLAG_INHERIT;
+BOOST_CONSTEXPR_OR_CONST DWORD_ HANDLE_FLAG_PROTECT_FROM_CLOSE_ = HANDLE_FLAG_PROTECT_FROM_CLOSE;
 
 #else
 
-const DWORD_ HANDLE_FLAG_INHERIT_            = 0x1;
-const DWORD_ HANDLE_FLAG_PROTECT_FROM_CLOSE_ = 0x2;
+BOOST_CONSTEXPR_OR_CONST DWORD_ HANDLE_FLAG_INHERIT_            = 0x1;
+BOOST_CONSTEXPR_OR_CONST DWORD_ HANDLE_FLAG_PROTECT_FROM_CLOSE_ = 0x2;
 
 #endif
 
 }
 }
+
+#include <boost/winapi/detail/footer.hpp>
 
 #endif // BOOST_WINAPI_PARTITION_DESKTOP
 
